@@ -21,10 +21,13 @@
 #define I2S_NUM           I2S_NUM_0           // 0 or 1
 #define I2S_SAMPLE_RATE   16000
 
-#define I2S_PIN_CLK       21 // 26
-#define I2S_PIN_WS        47 // 32
+// #define I2S_PIN_CLK       21 // 26
+#define I2S_PIN_CLK       5 // 26
+// #define I2S_PIN_WS        47 // 32
+#define I2S_PIN_WS        18 // esp32
 #define I2S_PIN_DOUT      I2S_PIN_NO_CHANGE
-#define I2S_PIN_DIN       48 // 33
+// #define I2S_PIN_DIN       48 // 33
+#define I2S_PIN_DIN       19 // 33
 
 #define BUFFER_SIZE       512
 
