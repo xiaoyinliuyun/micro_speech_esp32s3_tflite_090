@@ -21,10 +21,10 @@
 #define I2S_NUM           I2S_NUM_0           // 0 or 1
 #define I2S_SAMPLE_RATE   16000
 
-#define I2S_PIN_CLK       26
-#define I2S_PIN_WS        32
+#define I2S_PIN_CLK       21 // 26
+#define I2S_PIN_WS        47 // 32
 #define I2S_PIN_DOUT      I2S_PIN_NO_CHANGE
-#define I2S_PIN_DIN       33
+#define I2S_PIN_DIN       48 // 33
 
 #define BUFFER_SIZE       512
 
@@ -80,9 +80,9 @@ void InitI2S()
                                  // 我们假设当前的'dma_buf_len'是100，那么DMA缓冲区的实际长度是8 * 10
                                  // 注意，内部实际DMA缓冲区的长度不应该大于4092。
 
-    .use_apll             = false,
-    .tx_desc_auto_clear   = false,
-    .fixed_mclk           = 0
+    .use_apll             = false, // 设置指针，提供访问audioI2S使用APLL作为I2S主时钟，使其获得准确的时钟
+    .tx_desc_auto_clear   = false, // I2S自动清除tx描述符，如果有下流条件(有助于避免在数据不可用的情况下噪音)
+    .fixed_mclk           = 0 // I2S使用固定的MCLK输出。如果use_apll = true且fixed_mclk > 0，则i2s的时钟输出是固定的，并且等于fixed_mclk的值。如果fixed_mclk设置，mclk_multiple将不会生效
   };
   i2s_pin_config_t pin_config = {
     .bck_io_num           = I2S_PIN_CLK, // 26

@@ -41,14 +41,18 @@ void RespondToCommand(tflite::ErrorReporter* error_reporter,
                       int32_t current_time, const char* found_command,
                       uint8_t score, bool is_new_command) {
   static int32_t last_timestamp = 0;
-
+  if(score < 150){
+    return;
+  }
   // Score List Update
   uint8_t command = COMMAND_SILENCE;
   memset(scoreList, 0, sizeof(scoreList));
   if (strcmp(found_command, "silence") == 0) {
     command = COMMAND_SILENCE;
+    return;
   } else   if (strcmp(found_command, "unknown") == 0) {
     command = COMMAND_UNKNOWN;
+    return;
   } else   if (strcmp(found_command, "yes") == 0) {
     command = COMMAND_YES;
   } else   if (strcmp(found_command, "no") == 0) {
