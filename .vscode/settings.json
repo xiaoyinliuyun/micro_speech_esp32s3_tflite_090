@@ -1,7 +1,8 @@
 {
-    "idf.portWin": "COM8",
+    "idf.portWin": "COM9",
     "idf.adapterTargetName": "esp32s3",
     "idf.openOcdConfigs": [
-        "board/esp32s3-bridge.cfg"
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32s3.cfg"
     ]
 }
