@@ -52,6 +52,10 @@ QueueHandle_t xQueueAudioWave;
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
+  Serial.begin(115200);
+  Serial.printf("Default free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+  Serial.printf("PSRAM free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+
   xQueueAudioWave = xQueueCreate(QueueAudioWaveSize, sizeof(int16_t));
   
   // Set up logging. Google style is to avoid globals or statics because of
