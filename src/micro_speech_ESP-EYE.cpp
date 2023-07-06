@@ -53,9 +53,27 @@ QueueHandle_t xQueueAudioWave;
 // The name of this function is important for Arduino compatibility.
 void setup() {
   Serial.begin(115200);
+  // 指示各种内存系统能力的标志
   Serial.printf("Default free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
   Serial.printf("PSRAM free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
+Serial.printf("MALLOC_CAP_EXEC free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_EXEC));
+Serial.printf("MALLOC_CAP_32BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_32BIT));
+Serial.printf("MALLOC_CAP_8BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+Serial.printf("MALLOC_CAP_DMA free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DMA));
+
+Serial.printf("MALLOC_CAP_PID2 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID2));
+Serial.printf("MALLOC_CAP_PID3 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID3));
+Serial.printf("MALLOC_CAP_PID4 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID4));
+Serial.printf("MALLOC_CAP_PID5 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID5));
+Serial.printf("MALLOC_CAP_PID6 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID6));
+Serial.printf("MALLOC_CAP_PID7 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID7));
+
+
+Serial.printf("MALLOC_CAP_INTERNAL free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+Serial.printf("MALLOC_CAP_IRAM_8BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT));
+Serial.printf("MALLOC_CAP_RETENTION free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_RETENTION));
+Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_RTCRAM));
 
   xQueueAudioWave = xQueueCreate(QueueAudioWaveSize, sizeof(int16_t));
   
