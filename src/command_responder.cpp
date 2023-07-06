@@ -27,8 +27,8 @@ namespace {
 enum {
   COMMAND_SILENCE,
   COMMAND_UNKNOWN,
-  COMMAND_YES,
-  COMMAND_NO,
+  COMMAND_ON,
+  COMMAND_OFF,
 
   COMMAND_MAX
 };
@@ -53,10 +53,10 @@ void RespondToCommand(tflite::ErrorReporter* error_reporter,
   } else   if (strcmp(found_command, "unknown") == 0) {
     command = COMMAND_UNKNOWN;
     return;
-  } else   if (strcmp(found_command, "yes") == 0) {
-    command = COMMAND_YES;
-  } else   if (strcmp(found_command, "no") == 0) {
-    command = COMMAND_NO;
+  } else   if (strcmp(found_command, "on") == 0) {
+    command = COMMAND_ON;
+  } else   if (strcmp(found_command, "off") == 0) {
+    command = COMMAND_OFF;
   }
   scoreList[command] = score;
 
