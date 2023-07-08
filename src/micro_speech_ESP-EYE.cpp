@@ -31,52 +31,53 @@
 #include "tensorflow/lite/version.h"
 
 // Globals, used for compatibility with Arduino-style sketches.
-namespace {
-tflite::ErrorReporter* error_reporter = nullptr;
-const tflite::Model* model = nullptr;
-tflite::MicroInterpreter* interpreter = nullptr;
-TfLiteTensor* model_input = nullptr;
-FeatureProvider* feature_provider = nullptr;
-RecognizeCommands* recognizer = nullptr;
-int32_t previous_time = 0;
+namespace
+{
+  tflite::ErrorReporter *error_reporter = nullptr;
+  const tflite::Model *model = nullptr;
+  tflite::MicroInterpreter *interpreter = nullptr;
+  TfLiteTensor *model_input = nullptr;
+  FeatureProvider *feature_provider = nullptr;
+  RecognizeCommands *recognizer = nullptr;
+  int32_t previous_time = 0;
 
-// Create an area of memory to use for input, output, and intermediate arrays.
-// The size of this will depend on the model you're using, and may need to be
-// determined by experimentation.
-constexpr int kTensorArenaSize = 10 * 1024;
-uint8_t tensor_arena[kTensorArenaSize];
-}  // namespace
+  // Create an area of memory to use for input, output, and intermediate arrays.
+  // The size of this will depend on the model you're using, and may need to be
+  // determined by experimentation.
+  constexpr int kTensorArenaSize = 10 * 1024;
+  uint8_t tensor_arena[kTensorArenaSize];
+} // namespace
 
 QueueHandle_t xQueueAudioWave;
 #define QueueAudioWaveSize 32
 
 // The name of this function is important for Arduino compatibility.
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   // 指示各种内存系统能力的标志
   Serial.printf("Default free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
   Serial.printf("PSRAM free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
-Serial.printf("MALLOC_CAP_EXEC free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_EXEC));
-Serial.printf("MALLOC_CAP_32BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_32BIT));
-Serial.printf("MALLOC_CAP_8BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-Serial.printf("MALLOC_CAP_DMA free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DMA));
+  Serial.printf("MALLOC_CAP_EXEC free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_EXEC));
+  Serial.printf("MALLOC_CAP_32BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_32BIT));
+  Serial.printf("MALLOC_CAP_8BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+  Serial.printf("MALLOC_CAP_DMA free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DMA));
 
-Serial.printf("MALLOC_CAP_PID2 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID2));
-Serial.printf("MALLOC_CAP_PID3 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID3));
-Serial.printf("MALLOC_CAP_PID4 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID4));
-Serial.printf("MALLOC_CAP_PID5 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID5));
-Serial.printf("MALLOC_CAP_PID6 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID6));
-Serial.printf("MALLOC_CAP_PID7 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID7));
+  Serial.printf("MALLOC_CAP_PID2 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID2));
+  Serial.printf("MALLOC_CAP_PID3 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID3));
+  Serial.printf("MALLOC_CAP_PID4 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID4));
+  Serial.printf("MALLOC_CAP_PID5 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID5));
+  Serial.printf("MALLOC_CAP_PID6 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID6));
+  Serial.printf("MALLOC_CAP_PID7 free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_PID7));
 
-
-Serial.printf("MALLOC_CAP_INTERNAL free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-Serial.printf("MALLOC_CAP_IRAM_8BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT));
-Serial.printf("MALLOC_CAP_RETENTION free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_RETENTION));
-Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_RTCRAM));
+  Serial.printf("MALLOC_CAP_INTERNAL free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+  Serial.printf("MALLOC_CAP_IRAM_8BIT free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT));
+  Serial.printf("MALLOC_CAP_RETENTION free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_RETENTION));
+  Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_RTCRAM));
 
   xQueueAudioWave = xQueueCreate(QueueAudioWaveSize, sizeof(int16_t));
-  
+
   // Set up logging. Google style is to avoid globals or statics because of
   // lifetime uncertainty, but since this has a trivial destructor it's okay.
   // NOLINTNEXTLINE(runtime-global-variables)
@@ -86,11 +87,12 @@ Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLO
   // Map the model into a usable data structure. This doesn't involve any
   // copying or parsing, it's a very lightweight operation.
   model = tflite::GetModel(g_tiny_conv_micro_features_model_data);
-  if (model->version() != TFLITE_SCHEMA_VERSION) {
+  if (model->version() != TFLITE_SCHEMA_VERSION)
+  {
     error_reporter->Report(
-      "Model provided is schema version %d not equal "
-      "to supported version %d.",
-      model->version(), TFLITE_SCHEMA_VERSION);
+        "Model provided is schema version %d not equal "
+        "to supported version %d.",
+        model->version(), TFLITE_SCHEMA_VERSION);
     return;
   }
 
@@ -104,23 +106,24 @@ Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLO
   // NOLINTNEXTLINE(runtime-global-variables)
   static tflite::MicroMutableOpResolver micro_mutable_op_resolver;
   micro_mutable_op_resolver.AddBuiltin(
-    tflite::BuiltinOperator_DEPTHWISE_CONV_2D,
-    tflite::ops::micro::Register_DEPTHWISE_CONV_2D());
+      tflite::BuiltinOperator_DEPTHWISE_CONV_2D,
+      tflite::ops::micro::Register_DEPTHWISE_CONV_2D());
   micro_mutable_op_resolver.AddBuiltin(
-    tflite::BuiltinOperator_FULLY_CONNECTED,
-    tflite::ops::micro::Register_FULLY_CONNECTED());
+      tflite::BuiltinOperator_FULLY_CONNECTED,
+      tflite::ops::micro::Register_FULLY_CONNECTED());
   micro_mutable_op_resolver.AddBuiltin(tflite::BuiltinOperator_SOFTMAX,
                                        tflite::ops::micro::Register_SOFTMAX());
 
   // Build an interpreter to run the model with.
   static tflite::MicroInterpreter static_interpreter(
-    model, micro_mutable_op_resolver, tensor_arena, kTensorArenaSize,
-    error_reporter);
+      model, micro_mutable_op_resolver, tensor_arena, kTensorArenaSize,
+      error_reporter);
   interpreter = &static_interpreter;
 
   // Allocate memory from the tensor_arena for the model's tensors.
   TfLiteStatus allocate_status = interpreter->AllocateTensors();
-  if (allocate_status != kTfLiteOk) {
+  if (allocate_status != kTfLiteOk)
+  {
     error_reporter->Report("AllocateTensors() failed");
     return;
   }
@@ -130,7 +133,8 @@ Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLO
   if ((model_input->dims->size != 4) || (model_input->dims->data[0] != 1) ||
       (model_input->dims->data[1] != kFeatureSliceCount) ||
       (model_input->dims->data[2] != kFeatureSliceSize) ||
-      (model_input->type != kTfLiteUInt8)) {
+      (model_input->type != kTfLiteUInt8))
+  {
     error_reporter->Report("Bad input tensor parameters in model");
     return;
   }
@@ -139,7 +143,7 @@ Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLO
   // that will provide the inputs to the neural network.
   // NOLINTNEXTLINE(runtime-global-variables)
   static FeatureProvider static_feature_provider(kFeatureElementCount,
-      model_input->data.uint8);
+                                                 model_input->data.uint8);
   feature_provider = &static_feature_provider;
 
   static RecognizeCommands static_recognizer(error_reporter);
@@ -159,20 +163,24 @@ Serial.printf("MALLOC_CAP_RTCRAM free size: %d\n", heap_caps_get_free_size(MALLO
 }
 
 // The name of this function is important for Arduino compatibility.
-void loop() {
+void loop()
+{
   int16_t wave = 0;
-  for (int i = 0; i < QueueAudioWaveSize; i++) {
-    if (xQueueReceive(xQueueAudioWave, &wave, 0) == pdTRUE) {
+  for (int i = 0; i < QueueAudioWaveSize; i++)
+  {
+    if (xQueueReceive(xQueueAudioWave, &wave, 0) == pdTRUE)
+    {
       drawWave(wave);
     }
-  }  
+  }
 
   // Fetch the spectrogram for the current time.
   const int32_t current_time = LatestAudioTimestamp();
   int how_many_new_slices = 0;
   TfLiteStatus feature_status = feature_provider->PopulateFeatureData(
-                                  error_reporter, previous_time, current_time, &how_many_new_slices);
-  if (feature_status != kTfLiteOk) {
+      error_reporter, previous_time, current_time, &how_many_new_slices);
+  if (feature_status != kTfLiteOk)
+  {
     error_reporter->Report("Feature generation failed");
     delay(1);
     return;
@@ -180,28 +188,31 @@ void loop() {
   previous_time = current_time;
   // If no new audio samples have been received since last time, don't bother
   // running the network model.
-  if (how_many_new_slices == 0) {
+  if (how_many_new_slices == 0)
+  {
     delay(1);
     return;
   }
 
   // Run the model on the spectrogram input and make sure it succeeds.
   TfLiteStatus invoke_status = interpreter->Invoke();
-  if (invoke_status != kTfLiteOk) {
+  if (invoke_status != kTfLiteOk)
+  {
     error_reporter->Report("Invoke failed");
     delay(1);
     return;
   }
 
   // Obtain a pointer to the output tensor
-  TfLiteTensor* output = interpreter->output(0);
+  TfLiteTensor *output = interpreter->output(0);
   // Determine whether a command was recognized based on the output of inference
-  const char* found_command = nullptr;
+  const char *found_command = nullptr;
   uint8_t score = 0;
   bool is_new_command = false;
   TfLiteStatus process_status = recognizer->ProcessLatestResults(
-                                  output, current_time, &found_command, &score, &is_new_command);
-  if (process_status != kTfLiteOk) {
+      output, current_time, &found_command, &score, &is_new_command);
+  if (process_status != kTfLiteOk)
+  {
     error_reporter->Report("RecognizeCommands::ProcessLatestResults() failed");
     delay(1);
     return;

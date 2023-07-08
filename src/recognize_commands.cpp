@@ -35,13 +35,17 @@ RecognizeCommands::RecognizeCommands(tflite::ErrorReporter* error_reporter,
 TfLiteStatus RecognizeCommands::ProcessLatestResults(
     const TfLiteTensor* latest_results, const int32_t current_time_ms,
     const char** found_command, uint8_t* score, bool* is_new_command) {
+
+  error_reporter_->Report("average_window_duration_ms -> %d", average_window_duration_ms_);
+
   if ((latest_results->dims->size != 2) ||
       (latest_results->dims->data[0] != 1) ||
       (latest_results->dims->data[1] != kCategoryCount)) {
     error_reporter_->Report(
         "The results for recognition should contain %d elements, but there are "
         "%d in an %d-dimensional shape",
-        kCategoryCount, latest_results->dims->data[1],
+        kCategoryCount, 
+        latest_results->dims->data[1],
         latest_results->dims->size);
     return kTfLiteError;
   }
@@ -77,6 +81,12 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
   const int64_t how_many_results = previous_results_.size();
   const int64_t earliest_time = previous_results_.front().time_;
   const int64_t samples_duration = current_time_ms - earliest_time;
+  
+  
+  error_reporter_->Report("samples_duration-> %d", samples_duration);
+  error_reporter_->Report("how_many_results -> %d", how_many_results);
+  error_reporter_->Report("minimum_count_-> %d", minimum_count_);
+
   if ((how_many_results < minimum_count_) ||
       (samples_duration < (average_window_duration_ms_ / 4))) {
     *found_command = previous_top_label_;
@@ -85,12 +95,17 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
     return kTfLiteOk;
   }
 
+
+
   // Calculate the average score across all the results in the window.
   int32_t average_scores[kCategoryCount];
+
   for (int offset = 0; offset < previous_results_.size(); ++offset) {
+
     PreviousResultsQueue::Result previous_result =
         previous_results_.from_front(offset);
     const uint8_t* scores = previous_result.scores_;
+
     for (int i = 0; i < kCategoryCount; ++i) {
       if (offset == 0) {
         average_scores[i] = scores[i];
@@ -98,12 +113,17 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
         average_scores[i] += scores[i];
       }
     }
+
   }
+
+
+
   for (int i = 0; i < kCategoryCount; ++i) {
     average_scores[i] /= how_many_results;
   }
 
   // Find the current highest scoring category.
+  // 找出当前得分最高的类别。
   int current_top_index = 0;
   int32_t current_top_score = 0;
   for (int i = 0; i < kCategoryCount; ++i) {
