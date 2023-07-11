@@ -36,7 +36,7 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
     const TfLiteTensor* latest_results, const int32_t current_time_ms,
     const char** found_command, uint8_t* score, bool* is_new_command) {
 
-  error_reporter_->Report("average_window_duration_ms -> %d", average_window_duration_ms_);
+  // error_reporter_->Report("average_window_duration_ms -> %d", average_window_duration_ms_);
 
   if ((latest_results->dims->size != 2) ||
       (latest_results->dims->data[0] != 1) ||
@@ -83,9 +83,9 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
   const int64_t samples_duration = current_time_ms - earliest_time;
   
   
-  error_reporter_->Report("samples_duration-> %d", samples_duration);
-  error_reporter_->Report("how_many_results -> %d", how_many_results);
-  error_reporter_->Report("minimum_count_-> %d", minimum_count_);
+  // error_reporter_->Report("samples_duration-> %d", samples_duration);
+  // error_reporter_->Report("how_many_results -> %d", how_many_results);
+  // error_reporter_->Report("minimum_count_-> %d", minimum_count_);
 
   if ((how_many_results < minimum_count_) ||
       (samples_duration < (average_window_duration_ms_ / 4))) {
