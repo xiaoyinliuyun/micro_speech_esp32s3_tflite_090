@@ -44,7 +44,7 @@ void RespondToCommand(tflite::ErrorReporter *error_reporter,
                       uint8_t score, bool is_new_command)
 {
   static int32_t last_timestamp = 0;
-  if (score < 150)
+  if (score < 190)
   {
     return;
   }
