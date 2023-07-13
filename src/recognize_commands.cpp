@@ -107,7 +107,7 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
     const uint8_t* scores = previous_result.scores_;
 
     for (int i = 0; i < kCategoryCount; ++i) {
-      error_reporter_->Report("score_[%d] -> %d", i, scores[i]);
+      // error_reporter_->Report("score_[%d] -> %d", i, scores[i]);
 
       if (offset == 0) {
         average_scores[i] = scores[i];
