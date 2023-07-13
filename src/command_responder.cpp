@@ -78,10 +78,10 @@ void RespondToCommand(tflite::ErrorReporter *error_reporter,
                       uint8_t score, bool is_new_command)
 {
   static int32_t last_timestamp = 0;
-  // if (score < 150)
-  // {
-  //   return;
-  // }
+  if (score < 80)
+  {
+    return;
+  }
   // Score List Update
   uint8_t command = COMMAND_SILENCE;
   memset(scoreList, 0, sizeof(scoreList));
