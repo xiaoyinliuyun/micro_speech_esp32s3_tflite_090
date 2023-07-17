@@ -30,7 +30,7 @@ namespace
   {
     COMMAND_SILENCE,
     COMMAND_UNKNOWN,
-    COMMAND_go,
+    // COMMAND_go,
     // COMMAND_happy,
     // COMMAND_house,
     // COMMAND_learn,
@@ -62,9 +62,9 @@ namespace
     // COMMAND_seven,
     // COMMAND_eight,
     // COMMAND_nine,
-    COMMAND_on,
-    COMMAND_off,
-    COMMAND_stop,
+    // COMMAND_on,
+    // COMMAND_off,
+    // COMMAND_stop,
 
     COMMAND_MAX
   };
@@ -78,7 +78,7 @@ void RespondToCommand(tflite::ErrorReporter *error_reporter,
                       uint8_t score, bool is_new_command)
 {
   static int32_t last_timestamp = 0;
-  if (score < 100)
+  if (score < 150)
   {
     return;
   }
@@ -95,10 +95,10 @@ void RespondToCommand(tflite::ErrorReporter *error_reporter,
     command = COMMAND_UNKNOWN;
     return;
   }
-  else if (strcmp(found_command, "go") == 0)
-  {
-    command = COMMAND_go;
-  }
+  // else if (strcmp(found_command, "go") == 0)
+  // {
+  //   command = COMMAND_go;
+  // }
   // else if (strcmp(found_command, "happy") == 0)
   // {
   //   command = COMMAND_happy;
@@ -223,18 +223,18 @@ void RespondToCommand(tflite::ErrorReporter *error_reporter,
   // {
   //   command = COMMAND_nine;
   // }
-  else if (strcmp(found_command, "on") == 0)
-  {
-    command = COMMAND_on;
-  }
-  else if (strcmp(found_command, "off") == 0)
-  {
-    command = COMMAND_off;
-  }
-  else if (strcmp(found_command, "stop") == 0)
-  {
-    command = COMMAND_stop;
-  }
+  // else if (strcmp(found_command, "on") == 0)
+  // {
+  //   command = COMMAND_on;
+  // }
+  // else if (strcmp(found_command, "off") == 0)
+  // {
+  //   command = COMMAND_off;
+  // }
+  // else if (strcmp(found_command, "stop") == 0)
+  // {
+  //   command = COMMAND_stop;
+  // }
   
   scoreList[command] = score;
 

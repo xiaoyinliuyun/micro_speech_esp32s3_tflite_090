@@ -18,7 +18,7 @@ limitations under the License.
 const char* kCategoryLabels[kCategoryCount] = {
     "silence",
     "unknown",
-    "go",
+    // "go",
     // "happy",
     // "house",
     // "learn",
@@ -36,7 +36,7 @@ const char* kCategoryLabels[kCategoryCount] = {
     // "cat",
     // "dog",
     "up",
-    "down",
+    "down"
     // "sheila",
     // "visual",
     // "wow",
@@ -50,7 +50,7 @@ const char* kCategoryLabels[kCategoryCount] = {
     // "seven",
     // "eight",
     // "nine",
-    "on",
-    "off"
-    "stop"
+    // "on",
+    // "off"
+    // "stop"
 };
